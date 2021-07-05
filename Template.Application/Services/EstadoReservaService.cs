@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Template.Domain.Commands;
-using Template.Domain.Entities;
+﻿using Template.Domain.Commands;
 
 namespace Template.Application.Services
 {
@@ -19,6 +15,6 @@ namespace Template.Application.Services
 
         }
 
-        
+
     }
 }

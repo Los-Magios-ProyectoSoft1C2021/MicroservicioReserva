@@ -1,11 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
 using Template.Application.Services;
-using Template.Domain.Entities;
 
 namespace MicroservicioReservas.Controllers
 {
@@ -18,11 +12,11 @@ namespace MicroservicioReservas.Controllers
 
         public EstadoReservaController(IReservaService service)
         {
-            _service = service; 
+            _service = service;
         }
 
-       
 
-        
+
+
     }
 }

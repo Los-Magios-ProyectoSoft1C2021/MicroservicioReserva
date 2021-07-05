@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Template.Domain.Entities;
 using Template.Domain.Queries;
@@ -120,7 +119,7 @@ namespace Template.AccessData.Queries
         public async Task<List<ReservasGroupByHotelIdDTO>> GetAllHabitacionesReservadasEntre(DateTime fechaInicio, DateTime fechaFin)
         {
 
-            List<Reserva> listaDeReservas,listaDeValores,listaAux;
+            List<Reserva> listaDeReservas, listaDeValores, listaAux;
             List<ReservasGroupByHotelIdDTO> listaDeReservasPorHotel = new List<ReservasGroupByHotelIdDTO>();
             Dictionary<int, List<Reserva>> diccionarioDeHoteles = new Dictionary<int, List<Reserva>>();
 

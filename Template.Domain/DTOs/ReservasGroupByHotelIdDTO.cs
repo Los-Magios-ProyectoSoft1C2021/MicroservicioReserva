@@ -9,5 +9,5 @@ namespace Template.Domain.Entities
 
         public List<Reserva> Reservas { get; set; }
     }
-   
+
 }

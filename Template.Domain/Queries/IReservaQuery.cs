@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Template.Domain.Entities;
 
@@ -12,7 +11,7 @@ namespace Template.Domain.Queries
 
         List<ReservaDTO> GetReservaByHotelId(int id);
 
-        List <ReservaDTO> GetAllReserva();
+        List<ReservaDTO> GetAllReserva();
 
         Task<List<ReservasGroupByHotelIdDTO>> GetAllHabitacionesReservadasEntre(DateTime fechaInicio, DateTime fechaFin);
 

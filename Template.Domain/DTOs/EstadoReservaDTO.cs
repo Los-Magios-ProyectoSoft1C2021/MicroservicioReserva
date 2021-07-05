@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Template.Domain.Entities
+﻿namespace Template.Domain.Entities
 {
     public class EstadoReservaDTO
     {

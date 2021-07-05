@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Template.Domain.EntitiesConfiguration;
 using Template.Domain.Entities;
+using Template.Domain.EntitiesConfiguration;
 
 namespace Template.AccessData
 {
@@ -16,7 +13,7 @@ namespace Template.AccessData
 
         public DbSet<Reserva> Reserva { get; set; }
         public DbSet<EstadoReserva> EstadoReserva { get; set; }
-        
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Template.Domain.Commands;
+﻿using Template.Domain.Commands;
 
 namespace Template.AccessData.Commands
 {

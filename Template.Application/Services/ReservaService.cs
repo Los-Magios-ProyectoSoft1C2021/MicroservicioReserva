@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using Template.Domain.Commands;
 using Template.Domain.Entities;
@@ -15,29 +14,29 @@ namespace Template.Application.Services
         private readonly IGenericsRepository _repository;
         private readonly IReservaQuery _reservaQuery;
 
-        public ReservaService(IGenericsRepository repository,IReservaQuery reservaQuery)
+        public ReservaService(IGenericsRepository repository, IReservaQuery reservaQuery)
         {
             _repository = repository;
             _reservaQuery = reservaQuery;
         }
-                
+
 
         public void CreateReserva(ReservaDTO reserva)
         {
             //Aca "parsea" metiendo los datos de ReservaDTO en reserva
             //Hay maneras mas felices de hacer esto...
 
-           
+
             var entity = new Reserva
             {
                 ReservaId = Guid.NewGuid(),  // aqui se genera el Id de la reserva
-                UsuarioId = reserva.UsuarioId,                    
-                HabitacionId = reserva.HabitacionId, 
+                UsuarioId = reserva.UsuarioId,
+                HabitacionId = reserva.HabitacionId,
                 HotelId = reserva.HotelId,
-                FechaInicio = reserva.FechaInicio,             
-                FechaFin = reserva.FechaFin,                   
+                FechaInicio = reserva.FechaInicio,
+                FechaFin = reserva.FechaFin,
                 EstadoReservaId = 2  //Reservado
-                                                    
+
             };
 
             _repository.Add<Reserva>(entity);
@@ -61,11 +60,11 @@ namespace Template.Application.Services
             _repository.Update<Reserva>(entity);
         }
 
-    
+
 
         public List<ReservaDTO> GetReservaByUserId(int userId)
         {
-                       
+
             return _reservaQuery.GetReservaByUserId(userId);
 
         }

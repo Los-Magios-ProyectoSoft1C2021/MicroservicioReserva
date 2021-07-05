@@ -1,9 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Template.Application.Services;
@@ -11,7 +10,7 @@ using Template.Domain.Entities;
 
 namespace MicroservicioReservas.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/reserva")]
     [ApiController]
     public class ReservaController : ControllerBase
     {
@@ -20,55 +19,72 @@ namespace MicroservicioReservas.Controllers
 
         public ReservaController(IReservaService service)
         {
-            _service = service; 
+            _service = service;
         }
 
-        [Route("/api/reserva/")]
+        [Authorize(Policy = "UsuarioOnly")]
         [HttpPost]
-        public IActionResult PostReserva([FromBody] ReservaDTO reserva)
+        public ActionResult PostReserva([FromBody] ReservaDTO reserva)
         {
+            var usuario = HttpContext.User;
+            var usuarioId = usuario.FindFirst("UsuarioId");
+            if (usuarioId != null && (int.Parse(usuarioId.Value) == reserva.UsuarioId))
+            {
+                _service.CreateReserva(reserva);
+                return Created(uri: "api/reserva/", null);
+            }
 
-             _service.CreateReserva(reserva);
-             return Created(uri: "api/reserva/",null);
+            return Unauthorized();
         }
 
-
-        [Route("/api/reserva/GetByUserId/")]
-        [HttpGet]
-        public List<ReservaDTO> GetReservaByUserId([FromBody]int id)
+        [Authorize(Policy = "UsuarioOnly")]
+        [HttpGet("usuario")]
+        public ActionResult<List<ReservaDTO>> GetReservaByUser()
         {
-            return _service.GetReservaByUserId(id);    
+            var usuario = HttpContext.User;
+            var usuarioId = usuario.FindFirst("UsuarioId");
+            if (usuarioId != null)
+                return _service.GetReservaByUserId(int.Parse(usuarioId.Value));
+
+            return Unauthorized();
         }
-        
-        [Route("/api/reserva/update")]
-        [HttpPatch]       
-        public IActionResult PatchReserva([FromBody] ReservaDTO reserva)
-        {
 
-            _service.UpdateReserva(reserva);    
-            
+        [Authorize(Policy = "UsuarioOnly")]
+        [HttpPut]
+        public ActionResult PutReserva([FromBody] ReservaDTO reserva)
+        {
             if (reserva == null)
-                return NotFound();
-            return Ok(reserva);
+                return BadRequest("El body no puede estar vacío");
 
+            var usuario = HttpContext.User;
+            var usuarioId = usuario.FindFirst("UsuarioId");
+            if (usuarioId != null)
+            {
+                if (usuarioId != null && (int.Parse(usuarioId.Value) == reserva.UsuarioId))
+                    _service.UpdateReserva(reserva);
+
+                return Ok(reserva);
+            }
+
+            return Unauthorized();
         }
 
         // Se utiliza para chequear disponibilidad de habitaciones
-        [Route("/api/reserva/GetByHotelId/")]
-        [HttpGet]
-        public List<ReservaDTO> GetReservaByHotelId([FromBody] int hotelId)
+        [Authorize(Policy = "AdminOnly")]
+        [HttpGet("hotel")]
+        public ActionResult<List<ReservaDTO>> GetReservaByHotelId([FromQuery] int hotelId)
         {
-            return _service.GetReservaByHotelId(hotelId);
+            return Ok(_service.GetReservaByHotelId(hotelId));
         }
 
-        [Route("/api/reserva/GetAll/")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet]
-        public List<ReservaDTO> GetAllReserva()
+        public ActionResult<List<ReservaDTO>> GetAllReserva()
         {
-            return _service.GetAllReserva();
+            return Ok(_service.GetAllReserva());
         }
 
-        [Route("/api/reserva/GetAllHabitacionesReservadasEntre/")]
+        [Authorize(Policy = "AdminOnly")]
         [HttpGet]
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -77,25 +93,21 @@ namespace MicroservicioReservas.Controllers
                                         [FromQuery(Name = "FechaInicio")] string strFechaInicio,
                                         [FromQuery(Name = "FechaFin")] string strFechaFin)
         {
-
             DateTime fechaInicio = new DateTime();
             DateTime fechaFin = new DateTime();
 
-            if ( DateTime.TryParse(strFechaInicio, out fechaInicio) &&
-                 DateTime.TryParse(strFechaFin, out fechaFin))                
-
+            if (DateTime.TryParse(strFechaInicio, out fechaInicio) &&
+                DateTime.TryParse(strFechaFin, out fechaFin))
                 return BadRequest("Formato de ingreso de fechas incorrecto");
 
             if (fechaFin < fechaInicio)
-
                 return BadRequest("La fecha de fin es menor a la fecha de inicio de la reserva");
 
             List<ReservasGroupByHotelIdDTO> habitacionesReservadas;
 
-            habitacionesReservadas = await _service.GetAllHabitacionesReservadasEntre(fechaInicio,fechaFin);
+            habitacionesReservadas = await _service.GetAllHabitacionesReservadasEntre(fechaInicio, fechaFin);
 
             return Ok(habitacionesReservadas);
-         
         }
 
     }
