@@ -7,6 +7,8 @@ namespace Template.Domain.Queries
 {
     public interface IReservaQuery
     {
+        ReservaDTO GetReservaById(Guid id);
+
         List<ReservaDTO> GetReservaByUserId(int id);
 
         List<ReservaDTO> GetReservaByHotelId(int id);
@@ -14,7 +16,6 @@ namespace Template.Domain.Queries
         List<ReservaDTO> GetAllReserva();
 
         Task<List<ReservasGroupByHotelIdDTO>> GetAllHabitacionesReservadasEntre(DateTime fechaInicio, DateTime fechaFin);
-
     }
 
 

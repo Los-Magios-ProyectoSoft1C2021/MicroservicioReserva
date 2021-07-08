@@ -18,15 +18,34 @@ namespace Template.AccessData.Queries
             _context = context;
         }
 
+        public ReservaDTO GetReservaById(Guid id)
+        {
+            var reserva = _context.Reserva
+                .Where(x => x.ReservaId == id)
+                .Select(x => new ReservaDTO
+                {
+                    ReservaId = x.ReservaId,
+                    HotelId = x.HotelId,
+                    HabitacionId = x.HabitacionId,
+                    UsuarioId = x.UsuarioId,
+                    FechaInicio = x.FechaInicio,
+                    FechaFin = x.FechaFin,
+                    EstadoReservaId = x.EstadoReservaId
+                })
+                .FirstOrDefault();
+
+            return reserva;
+        }
+
         public List<ReservaDTO> GetReservaByUserId(int id)
         {
 
             List<Reserva> listaDeReservas = new List<Reserva>();
             List<ReservaDTO> listaDeReservasDTO = new List<ReservaDTO>();
 
-            listaDeReservas = _context.Set<Reserva>().
-                                       Where(x => x.UsuarioId == id).
-                                                 ToList();
+            listaDeReservas = _context.Set<Reserva>()
+                .Where(x => x.UsuarioId == id)
+                .ToList();
 
             // mapeo entre Reserva y ReservaDTO
 
@@ -58,9 +77,9 @@ namespace Template.AccessData.Queries
             List<Reserva> listaDeReservas = new List<Reserva>();
             List<ReservaDTO> listaDeReservasDTO = new List<ReservaDTO>();
 
-            listaDeReservas = _context.Set<Reserva>().
-                                       Where(x => x.HotelId == hotelId).
-                                                 ToList();
+            listaDeReservas = _context.Set<Reserva>()
+                .Where(x => x.HotelId == hotelId)
+                .ToList();
 
             // mapeo entre Reserva y ReservaDTO
 
@@ -118,41 +137,26 @@ namespace Template.AccessData.Queries
 
         public async Task<List<ReservasGroupByHotelIdDTO>> GetAllHabitacionesReservadasEntre(DateTime fechaInicio, DateTime fechaFin)
         {
+            var results = await _context.Reserva
+                .Where(x => (fechaInicio >= x.FechaInicio && fechaInicio <= x.FechaFin) ||
+                    (fechaFin >= x.FechaInicio && fechaFin <= x.FechaFin) ||
+                    (fechaInicio <= x.FechaInicio && fechaFin >= x.FechaFin))
+                .ToListAsync();
 
-            List<Reserva> listaDeReservas, listaDeValores, listaAux;
-            List<ReservasGroupByHotelIdDTO> listaDeReservasPorHotel = new List<ReservasGroupByHotelIdDTO>();
-            Dictionary<int, List<Reserva>> diccionarioDeHoteles = new Dictionary<int, List<Reserva>>();
-
-            listaDeReservas = await _context.Set<Reserva>().
-                   Where(x => (x.FechaInicio >= fechaInicio && fechaInicio <= x.FechaFin) ||
-                              (x.FechaInicio >= fechaFin && fechaFin <= x.FechaFin)).ToListAsync();
-
-            foreach (Reserva elem in listaDeReservas)
+            var reservados = new Dictionary<int, List<int>>();
+            foreach (var result in results)
             {
-                if (diccionarioDeHoteles.TryGetValue(elem.HotelId, out listaDeValores))
-                {
-                    listaDeValores.Add(elem);
-                    diccionarioDeHoteles.Remove(elem.HotelId);
-                    diccionarioDeHoteles.Add(elem.HotelId, listaDeValores);
-                }
-                else
-                {
-                    listaAux = new List<Reserva>();
-                    listaAux.Add(elem);
-                    diccionarioDeHoteles.Add(elem.HotelId, listaAux);
-                }
+                if (!reservados.ContainsKey(result.HotelId))
+                    reservados[result.HotelId] = new List<int>();
+
+                reservados[result.HotelId].Add(result.HabitacionId);
             }
 
-            foreach (var elem in diccionarioDeHoteles)
-            {
-                ReservasGroupByHotelIdDTO elementoListaReservaPorHotel = new ReservasGroupByHotelIdDTO();
-                elementoListaReservaPorHotel.HotelId = elem.Key;
-                elementoListaReservaPorHotel.Reservas = elem.Value;
-                listaDeReservasPorHotel.Add(elementoListaReservaPorHotel);
-            }
+            var reservas = new List<ReservasGroupByHotelIdDTO>();
+            foreach (KeyValuePair<int, List<int>> pair in reservados)
+                reservas.Add(new ReservasGroupByHotelIdDTO { HotelId = pair.Key, Habitaciones = pair.Value });
 
-            return listaDeReservasPorHotel;
-
+            return reservas;
         }
     }
 }

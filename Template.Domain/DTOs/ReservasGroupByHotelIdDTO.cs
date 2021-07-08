@@ -7,7 +7,7 @@ namespace Template.Domain.Entities
     {
         public int HotelId { get; set; }
 
-        public List<Reserva> Reservas { get; set; }
+        public List<int> Habitaciones { get; set; }
     }
 
 }

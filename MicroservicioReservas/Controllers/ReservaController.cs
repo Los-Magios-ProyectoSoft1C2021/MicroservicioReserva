@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Template.Application.Services;
+using Template.Domain.DTOs.Request;
 using Template.Domain.Entities;
 
 namespace MicroservicioReservas.Controllers
@@ -24,14 +25,19 @@ namespace MicroservicioReservas.Controllers
 
         [Authorize(Policy = "UsuarioOnly")]
         [HttpPost]
-        public ActionResult PostReserva([FromBody] ReservaDTO reserva)
+        public async Task<ActionResult> PostReserva([FromBody] RequestCreateReservaDTO reserva)
         {
             var usuario = HttpContext.User;
             var usuarioId = usuario.FindFirst("UsuarioId");
-            if (usuarioId != null && (int.Parse(usuarioId.Value) == reserva.UsuarioId))
+            
+            if (usuarioId != null)
             {
-                _service.CreateReserva(reserva);
-                return Created(uri: "api/reserva/", null);
+                var r = await _service.CreateReserva(int.Parse(usuarioId.Value), reserva);
+
+                if (r != null)
+                    return Created(uri: "api/reserva/", r);
+                else
+                    return Problem(statusCode: 500, detail: "No es posible computar la reserva");
             }
 
             return Unauthorized();
@@ -43,6 +49,7 @@ namespace MicroservicioReservas.Controllers
         {
             var usuario = HttpContext.User;
             var usuarioId = usuario.FindFirst("UsuarioId");
+
             if (usuarioId != null)
                 return _service.GetReservaByUserId(int.Parse(usuarioId.Value));
 
@@ -51,19 +58,20 @@ namespace MicroservicioReservas.Controllers
 
         [Authorize(Policy = "UsuarioOnly")]
         [HttpPut]
-        public ActionResult PutReserva([FromBody] ReservaDTO reserva)
+        public ActionResult PutReserva([FromBody] RequestUpdateReservaDTO reserva)
         {
             if (reserva == null)
                 return BadRequest("El body no puede estar vacío");
 
             var usuario = HttpContext.User;
             var usuarioId = usuario.FindFirst("UsuarioId");
+
             if (usuarioId != null)
             {
-                if (usuarioId != null && (int.Parse(usuarioId.Value) == reserva.UsuarioId))
-                    _service.UpdateReserva(reserva);
+                var modifiedReserva = _service.UpdateReserva(int.Parse(usuarioId.Value), reserva);
 
-                return Ok(reserva);
+                if (modifiedReserva != null)
+                    return Ok(reserva);
             }
 
             return Unauthorized();
@@ -93,20 +101,14 @@ namespace MicroservicioReservas.Controllers
                                         [FromQuery(Name = "FechaInicio")] string strFechaInicio,
                                         [FromQuery(Name = "FechaFin")] string strFechaFin)
         {
-            DateTime fechaInicio = new DateTime();
-            DateTime fechaFin = new DateTime();
-
-            if (!(DateTime.TryParse(strFechaInicio, out fechaInicio) &&
-                DateTime.TryParse(strFechaFin, out fechaFin)))
-                return BadRequest("Formato de ingreso de fechas incorrecto");
+            if (!(DateTime.TryParse(strFechaInicio, out DateTime fechaInicio) &&
+                DateTime.TryParse(strFechaFin, out DateTime fechaFin)))
+                return Problem(statusCode: 400, detail: "Las fechas no tienen el formato correcto");
 
             if (fechaFin < fechaInicio)
-                return BadRequest("La fecha de fin es menor a la fecha de inicio de la reserva");
+                return Problem(statusCode: 400, detail: "Las fecha de fin debe ser mayor a la fecha de inicio");
 
-            List<ReservasGroupByHotelIdDTO> habitacionesReservadas;
-
-            habitacionesReservadas = await _service.GetAllHabitacionesReservadasEntre(fechaInicio, fechaFin);
-
+            var habitacionesReservadas = await _service.GetAllHabitacionesReservadasEntre(fechaInicio, fechaFin);
             return Ok(habitacionesReservadas);
         }
 

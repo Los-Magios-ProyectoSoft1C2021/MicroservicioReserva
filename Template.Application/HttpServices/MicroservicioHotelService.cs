@@ -1,7 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Template.Domain.DTOs.HttpResponse;
 
 namespace Template.Application.HttpServices
 {
@@ -41,6 +45,28 @@ namespace Template.Application.HttpServices
             catch
             {
                 return false;
+            }
+        }
+
+        public async Task<List<int>> GetHabitacionesByHotelAndTipo(int hotelId, int tipo)
+        {
+            try
+            {
+                var response = await Client.GetAsync($"/api/hotel/{hotelId}/habitacion/?categoria={tipo}");
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    string jsonText = await response.Content.ReadAsStringAsync();
+
+                    var deserialized = JsonConvert.DeserializeObject<List<ResponseHabitacionDto>>(jsonText);
+                    return deserialized.Select(x => x.HabitacionId).Distinct().ToList();
+                }
+                else {
+                    return null;
+                }
+            } catch
+            {
+                return null;
             }
         }
     }

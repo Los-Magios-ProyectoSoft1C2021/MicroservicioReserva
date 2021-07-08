@@ -11,6 +11,5 @@ namespace Template.Domain.Entities
         public DateTime FechaInicio { get; set; }
         public DateTime FechaFin { get; set; }
         public int EstadoReservaId { get; set; }
-
     }
 }
