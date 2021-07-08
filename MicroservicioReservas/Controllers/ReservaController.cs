@@ -84,8 +84,8 @@ namespace MicroservicioReservas.Controllers
             return Ok(_service.GetAllReserva());
         }
 
-        [Authorize(Policy = "AdminOnly")]
-        [HttpGet]
+        [AllowAnonymous]
+        [HttpGet("fecha")]
         [Consumes(MediaTypeNames.Application.Json)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -96,8 +96,8 @@ namespace MicroservicioReservas.Controllers
             DateTime fechaInicio = new DateTime();
             DateTime fechaFin = new DateTime();
 
-            if (DateTime.TryParse(strFechaInicio, out fechaInicio) &&
-                DateTime.TryParse(strFechaFin, out fechaFin))
+            if (!(DateTime.TryParse(strFechaInicio, out fechaInicio) &&
+                DateTime.TryParse(strFechaFin, out fechaFin)))
                 return BadRequest("Formato de ingreso de fechas incorrecto");
 
             if (fechaFin < fechaInicio)

@@ -38,28 +38,23 @@ namespace Template.AccessData.Migrations
                     b.HasData(
                         new
                         {
-                            EstadoReservaId = 1,
-                            Descripcion = "Disponible"
-                        },
-                        new
-                        {
                             EstadoReservaId = 2,
                             Descripcion = "Reservado"
                         },
                         new
                         {
                             EstadoReservaId = 3,
-                            Descripcion = "No ofrecido"
-                        },
-                        new
-                        {
-                            EstadoReservaId = 4,
                             Descripcion = "Cancelado"
                         },
                         new
                         {
-                            EstadoReservaId = 5,
+                            EstadoReservaId = 4,
                             Descripcion = "CanceladoAdmin"
+                        },
+                        new
+                        {
+                            EstadoReservaId = 5,
+                            Descripcion = "Finalizado"
                         });
                 });
 

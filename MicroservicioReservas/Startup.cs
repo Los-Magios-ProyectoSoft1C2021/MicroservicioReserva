@@ -1,3 +1,4 @@
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,10 +7,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Text;
 using Template.AccessData;
 using Template.AccessData.Commands;
 using Template.AccessData.Queries;
+using Template.Application.HttpServices;
 using Template.Application.Services;
 using Template.Domain.Commands;
 using Template.Domain.Queries;
@@ -28,7 +31,8 @@ namespace MicroservicioReservas
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<Startup>());
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                .AddJwtBearer(options =>
@@ -63,11 +67,14 @@ namespace MicroservicioReservas
             services.AddDbContext<TemplateDbContext>(options => options.UseSqlServer(connectionString));
 
             services.AddTransient<IGenericsRepository, GenericsRepository>();
-
             services.AddTransient<IReservaService, ReservaService>();
-
             services.AddTransient<IReservaQuery, ReservaQuery>();
+            services.AddTransient<IEstadoReservaService, EstadoReservaService>();
+            services.AddTransient<IEstadoReservaQuery, EstadoReservaQuery>();
 
+            services.AddCors(c => c.AddDefaultPolicy(x => x.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+
+            services.AddHttpClient<MicroservicioHotelService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -80,9 +87,11 @@ namespace MicroservicioReservas
 
             app.UseHttpsRedirection();
 
+            app.UseCors();
+
             app.UseRouting();
 
-            app.UseAuthorization();
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
