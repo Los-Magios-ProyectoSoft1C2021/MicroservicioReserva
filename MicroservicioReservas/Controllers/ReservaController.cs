@@ -29,7 +29,7 @@ namespace MicroservicioReservas.Controllers
         {
             var usuario = HttpContext.User;
             var usuarioId = usuario.FindFirst("UsuarioId");
-            
+
             if (usuarioId != null)
             {
                 var r = await _service.CreateReserva(int.Parse(usuarioId.Value), reserva);

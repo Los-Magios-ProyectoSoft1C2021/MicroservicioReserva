@@ -71,7 +71,7 @@ namespace Template.Application.Services
         public async Task<ReservaDTO> UpdateReserva(int usuarioId, RequestUpdateReservaDTO reserva)
         {
             var r = _reservaQuery.GetReservaById(reserva.ReservaId);
-            
+
             if (r.UsuarioId != usuarioId)
                 return null;
 

@@ -61,10 +61,12 @@ namespace Template.Application.HttpServices
                     var deserialized = JsonConvert.DeserializeObject<List<ResponseHabitacionDto>>(jsonText);
                     return deserialized.Select(x => x.HabitacionId).Distinct().ToList();
                 }
-                else {
+                else
+                {
                     return null;
                 }
-            } catch
+            }
+            catch
             {
                 return null;
             }

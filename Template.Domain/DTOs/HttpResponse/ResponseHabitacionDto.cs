@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Template.Domain.DTOs.HttpResponse
+﻿namespace Template.Domain.DTOs.HttpResponse
 {
     public class ResponseHabitacionDto
     {
