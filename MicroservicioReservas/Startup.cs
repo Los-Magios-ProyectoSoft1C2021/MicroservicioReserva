@@ -81,8 +81,8 @@ namespace MicroservicioReservas
                 options.SwaggerDoc("v1",
                     new Microsoft.OpenApi.Models.OpenApiInfo
                     {
-                        Title = "Hotel API",
-                        Description = "Swagger para Hotel API de Booking UNAJ",
+                        Title = "Reserva API",
+                        Description = "Swagger para Reserva API de Booking UNAJ",
                         Version = "v1"
                     });
 
@@ -100,7 +100,7 @@ namespace MicroservicioReservas
             app.UseSwagger();
             app.UseSwaggerUI(options =>
             {
-                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Hotel API");
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "Reserva API");
             });
 
             if (env.IsDevelopment())
