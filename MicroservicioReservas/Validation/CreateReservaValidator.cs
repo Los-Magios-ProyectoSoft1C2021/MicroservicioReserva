@@ -19,22 +19,16 @@ namespace MicroservicioReservas.Validation
             RuleFor(r => r.TipoHabitacionId)
                 .MustAsync(async (model, x, cancellable) =>
                 {
-                    return await hotelService.CheckIfHabitacionExists(model.HotelId, x);
-                }).WithMessage("La ID de la habitación ingresada no es válida");
+                    var habitaciones = await hotelService.GetHabitacionesByHotelAndTipo(model.HotelId, x);
 
-            RuleFor(r => r.FechaInicio)
-                .Must(x => x >= DateTime.Now).WithMessage("La fecha de inicio no puede ser menor a hoy");
+                    if (habitaciones != null)
+                        return habitaciones.Count > 0;
+                    else
+                        return false;
+                }).WithMessage("No hay habitaciones disponibles dentro de esa categoría");
 
             RuleFor(r => r.FechaFin)
-                .Must((model, x, y) => x < model.FechaInicio).WithMessage("La fecha de fin no puede ser menor a la fecha final");
-
-            /*
-            RuleFor(r => r.EstadoReservaId)
-                .MustAsync(async (x, cancellable) =>
-                {
-                    return await estadoReservaService.CheckIfEstadoExists(x);
-                }).WithMessage("No se ha ingresado una ID de estado de reserva válida");
-            */
+                .Must((model, x, y) => x > model.FechaInicio).WithMessage("La fecha de fin no puede ser menor a la fecha inicial");
         }
     }
 }
