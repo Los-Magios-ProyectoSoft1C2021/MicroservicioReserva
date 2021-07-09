@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using System;
 using Template.Application.HttpServices;
 using Template.Application.Services;
 using Template.Domain.DTOs.Request;
