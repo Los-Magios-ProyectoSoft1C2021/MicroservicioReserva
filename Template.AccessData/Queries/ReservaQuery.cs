@@ -18,11 +18,11 @@ namespace Template.AccessData.Queries
             _context = context;
         }
 
-        public ReservaDTO GetReservaById(Guid id)
+        public async Task<ResponseReservaDTO> GetReservaById(Guid id)
         {
-            var reserva = _context.Reserva
+            var reserva = await _context.Reserva
                 .Where(x => x.ReservaId == id)
-                .Select(x => new ReservaDTO
+                .Select(x => new ResponseReservaDTO
                 {
                     ReservaId = x.ReservaId,
                     HotelId = x.HotelId,
@@ -30,109 +30,68 @@ namespace Template.AccessData.Queries
                     UsuarioId = x.UsuarioId,
                     FechaInicio = x.FechaInicio,
                     FechaFin = x.FechaFin,
-                    EstadoReservaId = x.EstadoReservaId
+                    EstadoReserva = x.EstadoReserva.Descripcion
                 })
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             return reserva;
         }
 
-        public List<ReservaDTO> GetReservaByUserId(int id)
+        public async Task<List<ResponseReservaDTO>> GetReservaByUserId(int id)
         {
-
-            List<Reserva> listaDeReservas = new List<Reserva>();
-            List<ReservaDTO> listaDeReservasDTO = new List<ReservaDTO>();
-
-            listaDeReservas = _context.Set<Reserva>()
+            var listaDeReservas = await _context.Set<Reserva>()
                 .Where(x => x.UsuarioId == id)
-                .ToList();
-
-            // mapeo entre Reserva y ReservaDTO
-
-            foreach (Reserva elem in listaDeReservas)
-            {
-
-                ReservaDTO reservaDTO = new ReservaDTO
+                .Select(x => new ResponseReservaDTO
                 {
-                    ReservaId = elem.ReservaId,
-                    UsuarioId = elem.UsuarioId,
-                    HabitacionId = elem.HabitacionId,
-                    HotelId = elem.HotelId,
-                    FechaInicio = elem.FechaInicio,
-                    FechaFin = elem.FechaFin,
-                    EstadoReservaId = elem.EstadoReservaId
-                };
+                    ReservaId = x.ReservaId,
+                    UsuarioId = x.UsuarioId,
+                    HabitacionId = x.HabitacionId,
+                    HotelId = x.HotelId,
+                    FechaInicio = x.FechaInicio,
+                    FechaFin = x.FechaFin,
+                    EstadoReserva = x.EstadoReserva.Descripcion
+                })
+                .ToListAsync();
 
-                listaDeReservasDTO.Add(reservaDTO);
-
-            }
-
-            return listaDeReservasDTO;
+            return listaDeReservas;
         }
 
 
-        public List<ReservaDTO> GetReservaByHotelId(int hotelId)
+        public async Task<List<ResponseReservaDTO>> GetReservaByHotelId(int hotelId)
         {
-
-            List<Reserva> listaDeReservas = new List<Reserva>();
-            List<ReservaDTO> listaDeReservasDTO = new List<ReservaDTO>();
-
-            listaDeReservas = _context.Set<Reserva>()
+            var listaDeReservas = await _context.Set<Reserva>()
                 .Where(x => x.HotelId == hotelId)
-                .ToList();
-
-            // mapeo entre Reserva y ReservaDTO
-
-            foreach (Reserva elem in listaDeReservas)
-            {
-
-                ReservaDTO reservaDTO = new ReservaDTO
+                .Select(x => new ResponseReservaDTO
                 {
-                    ReservaId = elem.ReservaId,
-                    UsuarioId = elem.UsuarioId,
-                    HabitacionId = elem.HabitacionId,
-                    HotelId = elem.HotelId,
-                    FechaInicio = elem.FechaInicio,
-                    FechaFin = elem.FechaFin,
-                    EstadoReservaId = elem.EstadoReservaId
-                };
+                    ReservaId = x.ReservaId,
+                    UsuarioId = x.UsuarioId,
+                    HabitacionId = x.HabitacionId,
+                    HotelId = x.HotelId,
+                    FechaInicio = x.FechaInicio,
+                    FechaFin = x.FechaFin,
+                    EstadoReserva = x.EstadoReserva.Descripcion
+                })
+                .ToListAsync();
 
-                listaDeReservasDTO.Add(reservaDTO);
-
-            }
-
-            return listaDeReservasDTO;
+            return listaDeReservas;
         }
 
-        public List<ReservaDTO> GetAllReserva()
+        public async Task<List<ResponseReservaDTO>> GetAllReserva()
         {
-
-            List<Reserva> listaDeReservas;
-            List<ReservaDTO> listaDeReservasDTO = new List<ReservaDTO>();
-
-            listaDeReservas = _context.Set<Reserva>().ToList();
-
-            foreach (Reserva elem in listaDeReservas)
-            {
-
-                ReservaDTO reservaDTO = new ReservaDTO
+            var listaDeReservas = await _context.Set<Reserva>()
+                .Select(x => new ResponseReservaDTO
                 {
-                    ReservaId = elem.ReservaId,
-                    UsuarioId = elem.UsuarioId,
-                    HabitacionId = elem.HabitacionId,
-                    HotelId = elem.HotelId,
-                    FechaInicio = elem.FechaInicio,
-                    FechaFin = elem.FechaFin,
-                    EstadoReservaId = elem.EstadoReservaId
-                };
+                    ReservaId = x.ReservaId,
+                    UsuarioId = x.UsuarioId,
+                    HabitacionId = x.HabitacionId,
+                    HotelId = x.HotelId,
+                    FechaInicio = x.FechaInicio,
+                    FechaFin = x.FechaFin,
+                    EstadoReserva = x.EstadoReserva.Descripcion
+                })
+                .ToListAsync();
 
-                listaDeReservasDTO.Add(reservaDTO);
-
-            }
-
-            // mapeo entre Reserva y ReservaDTO
-
-            return listaDeReservasDTO;
+            return listaDeReservas;
         }
 
         public async Task<List<ReservasGroupByHotelIdDTO>> GetAllHabitacionesReservadasEntre(DateTime fechaInicio, DateTime fechaFin)

@@ -75,6 +75,7 @@ namespace MicroservicioReservas
             services.AddTransient<IEstadoReservaQuery, EstadoReservaQuery>();
 
             services.AddHttpClient<MicroservicioHotelService>();
+            services.AddHttpClient<MicroservicioUsuarioService>();
 
             services.AddSwaggerGen(options =>
             {

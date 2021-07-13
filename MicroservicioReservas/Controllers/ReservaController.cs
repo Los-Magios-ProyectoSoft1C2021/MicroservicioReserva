@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Net.Http.Headers;
 using System;
 using System.Collections.Generic;
 using System.Net.Mime;
@@ -45,20 +46,20 @@ namespace MicroservicioReservas.Controllers
 
         [Authorize(Policy = "UsuarioOnly")]
         [HttpGet("usuario")]
-        public ActionResult<List<ReservaDTO>> GetReservaByUser()
+        public async Task<ActionResult<List<ResponseReservaDTO>>> GetReservaByUser()
         {
             var usuario = HttpContext.User;
             var usuarioId = usuario.FindFirst("UsuarioId");
 
             if (usuarioId != null)
-                return _service.GetReservaByUserId(int.Parse(usuarioId.Value));
+                return await _service.GetReservaByUserId(int.Parse(usuarioId.Value));
 
             return Unauthorized();
         }
 
         [Authorize(Policy = "UsuarioOnly")]
         [HttpPut]
-        public ActionResult PutReserva([FromBody] RequestUpdateReservaDTO reserva)
+        public async Task<ActionResult> PutReserva([FromBody] RequestUpdateReservaDTO reserva)
         {
             if (reserva == null)
                 return BadRequest("El body no puede estar vacío");
@@ -68,7 +69,7 @@ namespace MicroservicioReservas.Controllers
 
             if (usuarioId != null)
             {
-                var modifiedReserva = _service.UpdateReserva(int.Parse(usuarioId.Value), reserva);
+                var modifiedReserva = await _service.UpdateReserva(int.Parse(usuarioId.Value), reserva);
 
                 if (modifiedReserva != null)
                     return Ok(reserva);
@@ -80,16 +81,17 @@ namespace MicroservicioReservas.Controllers
         // Se utiliza para chequear disponibilidad de habitaciones
         [Authorize(Policy = "AdminOnly")]
         [HttpGet("hotel")]
-        public ActionResult<List<ReservaDTO>> GetReservaByHotelId([FromQuery] int hotelId)
+        public async Task<ActionResult<List<ResponseReservaDTO>>> GetReservaByHotelId([FromQuery] int hotelId)
         {
-            return Ok(_service.GetReservaByHotelId(hotelId));
+            return Ok(await _service.GetReservaByHotelId(hotelId));
         }
 
         [Authorize(Policy = "AdminOnly")]
         [HttpGet]
-        public ActionResult<List<ReservaDTO>> GetAllReserva()
+        public async Task<ActionResult<List<ResponseReservaDTO>>> GetAllReserva()
         {
-            return Ok(_service.GetAllReserva());
+            var accessToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
+            return Ok(await _service.GetAllReserva(accessToken));
         }
 
         [AllowAnonymous]

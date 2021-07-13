@@ -13,19 +13,20 @@ namespace Template.Application.Services
 
     public class ReservaService : IReservaService
     {
-
         private readonly IGenericsRepository _repository;
         private readonly IReservaQuery _reservaQuery;
         private readonly MicroservicioHotelService _hotelService;
+        private readonly MicroservicioUsuarioService _usuarioService;
 
-        public ReservaService(IGenericsRepository repository, IReservaQuery reservaQuery, MicroservicioHotelService hotelService)
+        public ReservaService(IGenericsRepository repository, IReservaQuery reservaQuery, MicroservicioHotelService hotelService, MicroservicioUsuarioService usuarioService)
         {
             _repository = repository;
             _reservaQuery = reservaQuery;
             _hotelService = hotelService;
+            _usuarioService = usuarioService;
         }
 
-        public async Task<ReservaDTO> CreateReserva(int usuarioId, RequestCreateReservaDTO reserva)
+        public async Task<ResponseReservaDTO> CreateReserva(int usuarioId, RequestCreateReservaDTO reserva)
         {
             var habitaciones = await _hotelService.GetHabitacionesByHotelAndTipo(reserva.HotelId, reserva.TipoHabitacionId);
             var hReservadas = await _reservaQuery.GetAllHabitacionesReservadasEntre(reserva.FechaInicio, reserva.FechaFin);
@@ -56,21 +57,12 @@ namespace Template.Application.Services
 
             _repository.Add<Reserva>(entity);
 
-            return new ReservaDTO
-            {
-                ReservaId = entity.ReservaId,
-                UsuarioId = entity.UsuarioId,
-                HotelId = entity.HotelId,
-                HabitacionId = entity.HabitacionId,
-                FechaInicio = entity.FechaInicio,
-                FechaFin = entity.FechaFin,
-                EstadoReservaId = entity.EstadoReservaId
-            };
+            return await _reservaQuery.GetReservaById(entity.ReservaId);
         }
 
-        public async Task<ReservaDTO> UpdateReserva(int usuarioId, RequestUpdateReservaDTO reserva)
+        public async Task<ResponseReservaDTO> UpdateReserva(int usuarioId, RequestUpdateReservaDTO reserva)
         {
-            var r = _reservaQuery.GetReservaById(reserva.ReservaId);
+            var r = await _reservaQuery.GetReservaById(reserva.ReservaId);
 
             if (r.UsuarioId != usuarioId)
                 return null;
@@ -88,33 +80,35 @@ namespace Template.Application.Services
 
             _repository.Update<Reserva>(entity);
 
-            return new ReservaDTO
+            return await _reservaQuery.GetReservaById(entity.ReservaId);
+        }
+
+        public async Task<List<ResponseReservaDTO>> GetReservaByUserId(int userId)
+        {
+            return await _reservaQuery.GetReservaByUserId(userId);
+        }
+
+        public async Task<List<ResponseReservaDTO>> GetReservaByHotelId(int userId)
+        {
+            return await _reservaQuery.GetReservaByHotelId(userId);
+        }
+
+        public async Task<List<ResponseReservaDTO>> GetAllReserva(string token)
+        {
+            var reservas = await _reservaQuery.GetAllReserva();
+
+            foreach (var reserva in reservas)
             {
-                ReservaId = entity.ReservaId,
-                UsuarioId = entity.UsuarioId,
-                HotelId = entity.HotelId,
-                HabitacionId = entity.HabitacionId,
-                FechaInicio = entity.FechaInicio,
-                FechaFin = entity.FechaFin,
-                EstadoReservaId = entity.EstadoReservaId
-            };
-        }
+                var hotel = await _hotelService.GetHotelById(reserva.HotelId);
+                var usuario = await _usuarioService.GetUsuarioById(reserva.UsuarioId, token);
 
-        public List<ReservaDTO> GetReservaByUserId(int userId)
-        {
+                reserva.Hotel = hotel.Nombre;
+                reserva.NombreUsuario = usuario.NombreUsuario;
+                reserva.Nombre = usuario.Nombre;
+                reserva.Apellido = usuario.Apellido;
+            }
 
-            return _reservaQuery.GetReservaByUserId(userId);
-
-        }
-
-        public List<ReservaDTO> GetReservaByHotelId(int userId)
-        {
-            return _reservaQuery.GetReservaByHotelId(userId);
-        }
-
-        public List<ReservaDTO> GetAllReserva()
-        {
-            return _reservaQuery.GetAllReserva();
+            return reservas;
         }
 
         public async Task<List<ReservasGroupByHotelIdDTO>> GetAllHabitacionesReservadasEntre(DateTime fechaInicio, DateTime fechaFin)

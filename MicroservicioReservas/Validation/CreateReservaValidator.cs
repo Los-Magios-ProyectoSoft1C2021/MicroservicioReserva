@@ -7,7 +7,7 @@ namespace MicroservicioReservas.Validation
 {
     public class CreateReservaValidator : AbstractValidator<RequestCreateReservaDTO>
     {
-        public CreateReservaValidator(MicroservicioHotelService hotelService, IEstadoReservaService estadoReservaService)
+        public CreateReservaValidator(MicroservicioHotelService hotelService)
         {
             RuleFor(r => r.HotelId)
                 .MustAsync(async (x, cancellable) =>
