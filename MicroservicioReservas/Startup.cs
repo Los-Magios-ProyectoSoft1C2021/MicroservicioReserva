@@ -14,9 +14,11 @@ using System.Text;
 using Template.AccessData;
 using Template.AccessData.Commands;
 using Template.AccessData.Queries;
+using Template.Application.EmailServices;
 using Template.Application.HttpServices;
 using Template.Application.Services;
 using Template.Domain.Commands;
+using Template.Domain.Email;
 using Template.Domain.Queries;
 
 namespace MicroservicioReservas
@@ -76,6 +78,9 @@ namespace MicroservicioReservas
 
             services.AddHttpClient<MicroservicioHotelService>();
             services.AddHttpClient<MicroservicioUsuarioService>();
+
+            services.AddTransient<IEmailSender, EmailSender>();
+            services.Configure<EmailSenderOptions>(Configuration.GetSection("EmailSenderOptions"));
 
             services.AddSwaggerGen(options =>
             {

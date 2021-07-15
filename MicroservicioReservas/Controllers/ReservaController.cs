@@ -32,9 +32,11 @@ namespace MicroservicioReservas.Controllers
             var usuario = HttpContext.User;
             var usuarioId = usuario.FindFirst("UsuarioId");
 
+            var accessToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
+
             if (usuarioId != null)
             {
-                var r = await _service.CreateReserva(int.Parse(usuarioId.Value), reserva);
+                var r = await _service.CreateReserva(int.Parse(usuarioId.Value), accessToken, reserva);
 
                 if (r != null)
                     return Created(uri: "api/reserva/", r);
@@ -60,7 +62,7 @@ namespace MicroservicioReservas.Controllers
             return Unauthorized();
         }
 
-        [Authorize(Policy = "UsuarioOnly")]
+        [Authorize(Policy = "UsuarioAndAdminOnly")]
         [HttpPut("{id:Guid}")]
         public async Task<ActionResult> PutReserva(Guid id, [FromBody] RequestUpdateReservaDTO reserva)
         {
@@ -70,9 +72,11 @@ namespace MicroservicioReservas.Controllers
             var usuario = HttpContext.User;
             var usuarioId = usuario.FindFirst("UsuarioId");
 
+            var accessToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
+
             if (usuarioId != null)
             {
-                var modifiedReserva = await _service.UpdateReserva(int.Parse(usuarioId.Value), id, reserva);
+                var modifiedReserva = await _service.UpdateReserva(int.Parse(usuarioId.Value), accessToken, id, reserva);
 
                 if (modifiedReserva != null)
                     return Ok(modifiedReserva);
