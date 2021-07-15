@@ -64,36 +64,39 @@ namespace Template.Application.Services
             var hotel = await _hotelService.GetHotelById(entity.HotelId);
             var habitacion = await _hotelService.GetHabitacionById(entity.HotelId, entity.HabitacionId);
 
-            var emailUsuario = new NewReservaEmailUsuario
+            if (usuario != null && hotel != null && habitacion != null)
             {
-                Usuario = $"{usuario.Nombre} {usuario.Apellido}",
-                CorreoUsuario = usuario.Correo,
-                Hotel = hotel.Nombre,
-                CorreoHotel = hotel.Correo,
-                TelefonoHotel = hotel.Telefono,
-                DireccionHotel = $"{hotel.Direccion} {hotel.DireccionNum}, {hotel.Ciudad}, {hotel.Provincia}",
-                FechaInicio = reserva.FechaInicio,
-                FechaFin = reserva.FechaFin,
-                Habitacion = habitacion.Nombre,
-                TipoHabitacion = habitacion.Categoria.Nombre
-            };
+                var emailUsuario = new NewReservaEmailUsuario
+                {
+                    Usuario = $"{usuario.Nombre} {usuario.Apellido}",
+                    CorreoUsuario = usuario.Correo,
+                    Hotel = hotel.Nombre,
+                    CorreoHotel = hotel.Correo,
+                    TelefonoHotel = hotel.Telefono,
+                    DireccionHotel = $"{hotel.Direccion} {hotel.DireccionNum}, {hotel.Ciudad}, {hotel.Provincia}",
+                    FechaInicio = reserva.FechaInicio,
+                    FechaFin = reserva.FechaFin,
+                    Habitacion = habitacion.Nombre,
+                    TipoHabitacion = habitacion.Categoria.Nombre
+                };
 
-            await _emailSender.SendEmailAsync(email: emailUsuario.CorreoUsuario, subject: emailUsuario.GetSubjectEmail(), message: emailUsuario.GetBodyEmail())
-                .ConfigureAwait(false);
+                await _emailSender.SendEmailAsync(email: emailUsuario.CorreoUsuario, subject: emailUsuario.GetSubjectEmail(), message: emailUsuario.GetBodyEmail())
+                    .ConfigureAwait(false);
 
-            var emailHotel = new NewReservaEmailHotel
-            {
-                Usuario = $"{usuario.Nombre} {usuario.Apellido}",
-                CorreoUsuario = usuario.Correo,
-                TelefonoUsuario = usuario.Telefono,
-                Hotel = hotel.Nombre,
-                CorreoHotel = hotel.Correo,
-                FechaInicio = entity.FechaInicio,
-                FechaFin = entity.FechaFin
-            };
+                var emailHotel = new NewReservaEmailHotel
+                {
+                    Usuario = $"{usuario.Nombre} {usuario.Apellido}",
+                    CorreoUsuario = usuario.Correo,
+                    TelefonoUsuario = usuario.Telefono,
+                    Hotel = hotel.Nombre,
+                    CorreoHotel = hotel.Correo,
+                    FechaInicio = entity.FechaInicio,
+                    FechaFin = entity.FechaFin
+                };
 
-            await _emailSender.SendEmailAsync(email: emailHotel.CorreoHotel, subject: emailHotel.GetSubjectEmail(), message: emailHotel.GetBodyEmail())
-                .ConfigureAwait(false);
+                await _emailSender.SendEmailAsync(email: emailHotel.CorreoHotel, subject: emailHotel.GetSubjectEmail(), message: emailHotel.GetBodyEmail())
+                    .ConfigureAwait(false);
+            }
 
             return await _reservaQuery.GetReservaById(entity.ReservaId);
         }
@@ -121,38 +124,41 @@ namespace Template.Application.Services
 
             var reservaDb = await _reservaQuery.GetReservaById(entity.ReservaId);
 
-            var emailUsuario = new UpdateReservaEmailUsuario
+            if (usuario != null && hotel != null && habitacion != null)
             {
-                Usuario = $"{usuario.Nombre} {usuario.Apellido}",
-                CorreoUsuario = usuario.Correo,
-                Hotel = hotel.Nombre,
-                CorreoHotel = hotel.Correo,
-                TelefonoHotel = hotel.Telefono,
-                DireccionHotel = $"{hotel.Direccion} {hotel.DireccionNum}, {hotel.Ciudad}, {hotel.Provincia}",
-                FechaInicio = entity.FechaInicio,
-                FechaFin = entity.FechaFin,
-                Habitacion = habitacion.Nombre,
-                TipoHabitacion = habitacion.Categoria.Nombre,
-                EstadoReserva = reservaDb.EstadoReserva
-            };
+                var emailUsuario = new UpdateReservaEmailUsuario
+                {
+                    Usuario = $"{usuario.Nombre} {usuario.Apellido}",
+                    CorreoUsuario = usuario.Correo,
+                    Hotel = hotel.Nombre,
+                    CorreoHotel = hotel.Correo,
+                    TelefonoHotel = hotel.Telefono,
+                    DireccionHotel = $"{hotel.Direccion} {hotel.DireccionNum}, {hotel.Ciudad}, {hotel.Provincia}",
+                    FechaInicio = entity.FechaInicio,
+                    FechaFin = entity.FechaFin,
+                    Habitacion = habitacion.Nombre,
+                    TipoHabitacion = habitacion.Categoria.Nombre,
+                    EstadoReserva = reservaDb.EstadoReserva
+                };
 
-            await _emailSender.SendEmailAsync(email: emailUsuario.CorreoUsuario, subject: emailUsuario.GetSubjectEmail(), message: emailUsuario.GetBodyEmail())
-                .ConfigureAwait(false);
+                await _emailSender.SendEmailAsync(email: emailUsuario.CorreoUsuario, subject: emailUsuario.GetSubjectEmail(), message: emailUsuario.GetBodyEmail())
+                    .ConfigureAwait(false);
 
-            var emailHotel = new UpdateReservaEmailHotel
-            {
-                Usuario = $"{usuario.Nombre} {usuario.Apellido}",
-                CorreoUsuario = usuario.Correo,
-                TelefonoUsuario = usuario.Telefono,
-                Hotel = hotel.Nombre,
-                CorreoHotel = hotel.Correo,
-                FechaInicio = entity.FechaInicio,
-                FechaFin = entity.FechaFin,
-                EstadoReserva = reservaDb.EstadoReserva
-            };
+                var emailHotel = new UpdateReservaEmailHotel
+                {
+                    Usuario = $"{usuario.Nombre} {usuario.Apellido}",
+                    CorreoUsuario = usuario.Correo,
+                    TelefonoUsuario = usuario.Telefono,
+                    Hotel = hotel.Nombre,
+                    CorreoHotel = hotel.Correo,
+                    FechaInicio = entity.FechaInicio,
+                    FechaFin = entity.FechaFin,
+                    EstadoReserva = reservaDb.EstadoReserva
+                };
 
-            await _emailSender.SendEmailAsync(email: emailHotel.CorreoHotel, subject: emailHotel.GetSubjectEmail(), message: emailHotel.GetBodyEmail())
-                .ConfigureAwait(false);
+                await _emailSender.SendEmailAsync(email: emailHotel.CorreoHotel, subject: emailHotel.GetSubjectEmail(), message: emailHotel.GetBodyEmail())
+                    .ConfigureAwait(false);
+            }
 
             return reservaDb;
         }
