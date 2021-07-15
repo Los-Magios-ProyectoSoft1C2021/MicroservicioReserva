@@ -35,6 +35,11 @@ namespace Template.Application.Services
             var hReservadas = await _reservaQuery.GetAllHabitacionesReservadasEntre(reserva.FechaInicio, reserva.FechaFin);
             var habitacionesReservadas = hReservadas.Select(x => x.Habitaciones).FirstOrDefault();
 
+            if (hReservadas == null)
+            {
+                return null;
+            }
+
             var habitacionId = 0;
             if (habitaciones != null)
             {
@@ -42,7 +47,8 @@ namespace Template.Application.Services
                     .Where(x => habitacionesReservadas == null || !habitacionesReservadas.Contains(x))
                     .FirstOrDefault();
             }
-            else
+
+            if (habitacionId == 0)
             {
                 return null;
             }
