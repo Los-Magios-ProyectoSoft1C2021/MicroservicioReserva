@@ -87,11 +87,11 @@ namespace MicroservicioReservas.Controllers
 
         // Se utiliza para chequear disponibilidad de habitaciones
         [Authorize(Policy = "AdminOnly")]
-        [HttpGet("hotel")]
-        public async Task<ActionResult<List<ResponseReservaDTO>>> GetReservaByHotelId([FromQuery] int hotelId)
+        [HttpGet("hotel/{id:int}")]
+        public async Task<ActionResult<List<ResponseReservaDTO>>> GetReservaByHotelId(int id)
         {
             var accessToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
-            return await _service.GetReservaByHotelId(hotelId, accessToken);
+            return await _service.GetReservaByHotelId(id, accessToken);
         }
 
         [Authorize(Policy = "AdminOnly")]

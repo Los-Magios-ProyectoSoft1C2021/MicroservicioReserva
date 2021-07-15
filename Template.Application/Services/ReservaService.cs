@@ -191,17 +191,28 @@ namespace Template.Application.Services
             return reservas;
         }
 
-        public async Task<List<ResponseReservaDTO>> GetReservaByHotelId(int userId, string token)
+        public async Task<List<ResponseReservaDTO>> GetReservaByHotelId(int hotelId, string token)
         {
-            var reservas = await _reservaQuery.GetReservaByHotelId(userId);
+            var reservas = await _reservaQuery.GetReservaByHotelId(hotelId);
+            var hotel = await _hotelService.GetHotelById(hotelId);
 
             foreach (var reserva in reservas)
             {
-                var hotel = await _hotelService.GetHotelById(reserva.HotelId);
                 var usuario = await _usuarioService.GetUsuarioById(reserva.UsuarioId, token);
+                var habitacion = await _hotelService.GetHabitacionById(reserva.HotelId, reserva.HabitacionId);
 
-                if (hotel != null) 
+                if (hotel != null)
+                {
                     reserva.Hotel = hotel.Nombre;
+                    reserva.HotelEstrellas = hotel.Estrellas;
+                    reserva.HotelDireccion = $"{hotel.Direccion} {hotel.DireccionNum}, {hotel.Ciudad}";
+                }
+
+                if (habitacion != null)
+                {
+                    reserva.HabitacionNombre = habitacion.Nombre;
+                    reserva.HabitacionTipo = habitacion.Categoria.Nombre;
+                }
 
                 if (usuario != null)
                 {
