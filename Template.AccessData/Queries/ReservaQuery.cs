@@ -22,6 +22,7 @@ namespace Template.AccessData.Queries
         {
             var reserva = await _context.Reserva
                 .Where(x => x.ReservaId == id)
+                .OrderBy(x => x.FechaInicio)
                 .Select(x => new ResponseReservaDTO
                 {
                     ReservaId = x.ReservaId,
@@ -30,7 +31,8 @@ namespace Template.AccessData.Queries
                     UsuarioId = x.UsuarioId,
                     FechaInicio = x.FechaInicio,
                     FechaFin = x.FechaFin,
-                    EstadoReserva = x.EstadoReserva.Descripcion
+                    EstadoReserva = x.EstadoReserva.Descripcion,
+                    ReservaActiva = x.EstadoReservaId == 2
                 })
                 .FirstOrDefaultAsync();
 
@@ -41,6 +43,7 @@ namespace Template.AccessData.Queries
         {
             var listaDeReservas = await _context.Set<Reserva>()
                 .Where(x => x.UsuarioId == id)
+                .OrderBy(x => x.FechaInicio)
                 .Select(x => new ResponseReservaDTO
                 {
                     ReservaId = x.ReservaId,
@@ -49,7 +52,8 @@ namespace Template.AccessData.Queries
                     HotelId = x.HotelId,
                     FechaInicio = x.FechaInicio,
                     FechaFin = x.FechaFin,
-                    EstadoReserva = x.EstadoReserva.Descripcion
+                    EstadoReserva = x.EstadoReserva.Descripcion,
+                    ReservaActiva = x.EstadoReservaId == 2
                 })
                 .ToListAsync();
 
@@ -61,6 +65,7 @@ namespace Template.AccessData.Queries
         {
             var listaDeReservas = await _context.Set<Reserva>()
                 .Where(x => x.HotelId == hotelId)
+                .OrderBy(x => x.FechaInicio)
                 .Select(x => new ResponseReservaDTO
                 {
                     ReservaId = x.ReservaId,
@@ -69,7 +74,8 @@ namespace Template.AccessData.Queries
                     HotelId = x.HotelId,
                     FechaInicio = x.FechaInicio,
                     FechaFin = x.FechaFin,
-                    EstadoReserva = x.EstadoReserva.Descripcion
+                    EstadoReserva = x.EstadoReserva.Descripcion,
+                    ReservaActiva = x.EstadoReservaId == 2
                 })
                 .ToListAsync();
 
@@ -79,6 +85,7 @@ namespace Template.AccessData.Queries
         public async Task<List<ResponseReservaDTO>> GetAllReserva()
         {
             var listaDeReservas = await _context.Set<Reserva>()
+                .OrderBy(x => x.FechaInicio)
                 .Select(x => new ResponseReservaDTO
                 {
                     ReservaId = x.ReservaId,
@@ -87,7 +94,8 @@ namespace Template.AccessData.Queries
                     HotelId = x.HotelId,
                     FechaInicio = x.FechaInicio,
                     FechaFin = x.FechaFin,
-                    EstadoReserva = x.EstadoReserva.Descripcion
+                    EstadoReserva = x.EstadoReserva.Descripcion,
+                    ReservaActiva = x.EstadoReservaId == 2
                 })
                 .ToListAsync();
 
@@ -100,6 +108,7 @@ namespace Template.AccessData.Queries
                 .Where(x => (fechaInicio >= x.FechaInicio && fechaInicio <= x.FechaFin) ||
                     (fechaFin >= x.FechaInicio && fechaFin <= x.FechaFin) ||
                     (fechaInicio <= x.FechaInicio && fechaFin >= x.FechaFin))
+                .Where(x => x.EstadoReservaId == 2)
                 .ToListAsync();
 
             var reservados = new Dictionary<int, List<int>>();

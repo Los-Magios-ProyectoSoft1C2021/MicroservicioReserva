@@ -10,9 +10,9 @@ namespace Template.Application.Services
     public interface IReservaService
     {
         Task<ResponseReservaDTO> CreateReserva(int usuarioId, RequestCreateReservaDTO reserva);
-        Task<ResponseReservaDTO> UpdateReserva(int usuarioId, RequestUpdateReservaDTO reserva);
-        Task<List<ResponseReservaDTO>> GetReservaByUserId(int UserId);
-        Task<List<ResponseReservaDTO>> GetReservaByHotelId(int hotelId);
+        Task<ResponseReservaDTO> UpdateReserva(int usuarioId, Guid reservaId, RequestUpdateReservaDTO reserva);
+        Task<List<ResponseReservaDTO>> GetReservaByUserId(int usuarioId, string token);
+        Task<List<ResponseReservaDTO>> GetReservaByHotelId(int hotelId, string token);
         Task<List<ResponseReservaDTO>> GetAllReserva(string token);
         Task<List<ReservasGroupByHotelIdDTO>> GetAllHabitacionesReservadasEntre(DateTime fechaInicio, DateTime fechaFin);
     }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Mime;
@@ -51,15 +52,17 @@ namespace MicroservicioReservas.Controllers
             var usuario = HttpContext.User;
             var usuarioId = usuario.FindFirst("UsuarioId");
 
+            var accessToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
+
             if (usuarioId != null)
-                return await _service.GetReservaByUserId(int.Parse(usuarioId.Value));
+                return await _service.GetReservaByUserId(int.Parse(usuarioId.Value), accessToken);
 
             return Unauthorized();
         }
 
         [Authorize(Policy = "UsuarioOnly")]
-        [HttpPut]
-        public async Task<ActionResult> PutReserva([FromBody] RequestUpdateReservaDTO reserva)
+        [HttpPut("{id:Guid}")]
+        public async Task<ActionResult> PutReserva(Guid id, [FromBody] RequestUpdateReservaDTO reserva)
         {
             if (reserva == null)
                 return BadRequest("El body no puede estar vacío");
@@ -69,10 +72,10 @@ namespace MicroservicioReservas.Controllers
 
             if (usuarioId != null)
             {
-                var modifiedReserva = await _service.UpdateReserva(int.Parse(usuarioId.Value), reserva);
+                var modifiedReserva = await _service.UpdateReserva(int.Parse(usuarioId.Value), id, reserva);
 
                 if (modifiedReserva != null)
-                    return Ok(reserva);
+                    return Ok(modifiedReserva);
             }
 
             return Unauthorized();
@@ -83,7 +86,8 @@ namespace MicroservicioReservas.Controllers
         [HttpGet("hotel")]
         public async Task<ActionResult<List<ResponseReservaDTO>>> GetReservaByHotelId([FromQuery] int hotelId)
         {
-            return Ok(await _service.GetReservaByHotelId(hotelId));
+            var accessToken = Request.Headers[HeaderNames.Authorization].ToString().Replace("Bearer ", "");
+            return await _service.GetReservaByHotelId(hotelId, accessToken);
         }
 
         [Authorize(Policy = "AdminOnly")]

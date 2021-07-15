@@ -95,5 +95,29 @@ namespace Template.Application.HttpServices
                 return null;
             }
         }
+
+        public async Task<ResponseHabitacionDto> GetHabitacionById(int hotelId, int habitacionId)
+        {
+            try
+            {
+                var response = await Client.GetAsync($"/api/hotel/{hotelId}/habitacion/{habitacionId}");
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    string jsonText = await response.Content.ReadAsStringAsync();
+
+                    var deserialized = JsonConvert.DeserializeObject<ResponseHabitacionDto>(jsonText);
+                    return deserialized;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

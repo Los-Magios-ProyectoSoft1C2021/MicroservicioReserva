@@ -8,9 +8,6 @@ namespace MicroservicioReservas.Validation
     {
         public UpdateReservaValidator(IEstadoReservaService estadoReservaService)
         {
-            RuleFor(r => r.ReservaId)
-                .NotEmpty().WithMessage("La ID de la reserva no puede estar vacía");
-
             RuleFor(r => r.EstadoReservaId)
                 .MustAsync(async (x, cancellable) =>
                 {

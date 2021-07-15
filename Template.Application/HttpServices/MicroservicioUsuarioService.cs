@@ -45,5 +45,31 @@ namespace Template.Application.HttpServices
                 return null;
             }
         }
+
+        public async Task<ResponseUsuarioDto> GetUsuarioByToken(string token)
+        {
+            try
+            {
+                Client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+                var response = await Client.GetAsync($"/api/usuario/id");
+                Client.DefaultRequestHeaders.Remove("Authorization");
+
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    string jsonText = await response.Content.ReadAsStringAsync();
+
+                    var deserialized = JsonConvert.DeserializeObject<ResponseUsuarioDto>(jsonText);
+                    return deserialized;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }
