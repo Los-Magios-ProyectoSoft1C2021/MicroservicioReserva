@@ -76,7 +76,7 @@ namespace MicroservicioReservas.Controllers
 
             if (usuarioId != null)
             {
-                var modifiedReserva = await _service.UpdateReserva(int.Parse(usuarioId.Value), accessToken, id, reserva);
+                var modifiedReserva = await _service.UpdateReserva(accessToken, id, reserva);
 
                 if (modifiedReserva != null)
                     return Ok(modifiedReserva);

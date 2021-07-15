@@ -9,7 +9,7 @@ namespace Template.Application.Services
     public interface IReservaService
     {
         Task<ResponseReservaDTO> CreateReserva(int usuarioId, string token, RequestCreateReservaDTO reserva);
-        Task<ResponseReservaDTO> UpdateReserva(int usuarioId, string token, Guid reservaId, RequestUpdateReservaDTO reserva);
+        Task<ResponseReservaDTO> UpdateReserva(string token, Guid reservaId, RequestUpdateReservaDTO reserva);
         Task<List<ResponseReservaDTO>> GetReservaByUserId(int usuarioId, string token);
         Task<List<ResponseReservaDTO>> GetReservaByHotelId(int hotelId, string token);
         Task<List<ResponseReservaDTO>> GetAllReserva(string token);

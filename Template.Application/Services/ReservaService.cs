@@ -98,17 +98,14 @@ namespace Template.Application.Services
             return await _reservaQuery.GetReservaById(entity.ReservaId);
         }
 
-        public async Task<ResponseReservaDTO> UpdateReserva(int usuarioId, string token, Guid reservaId, RequestUpdateReservaDTO reserva)
+        public async Task<ResponseReservaDTO> UpdateReserva(string token, Guid reservaId, RequestUpdateReservaDTO reserva)
         {
             var r = await _reservaQuery.GetReservaById(reservaId);
-
-            if (r.UsuarioId != usuarioId)
-                return null;
 
             var entity = new Reserva
             {
                 ReservaId = reservaId,
-                UsuarioId = usuarioId,
+                UsuarioId = r.UsuarioId,
                 HabitacionId = r.HabitacionId,
                 HotelId = r.HotelId,
                 FechaInicio = r.FechaInicio,
